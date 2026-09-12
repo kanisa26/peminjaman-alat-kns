@@ -6,6 +6,7 @@
     'keyValue' => 'key',
     'keyLabel' => 'label',
     'placeholder' => null,
+    'wajib' => false,
 ])
 
 <div class="mb-3">
@@ -13,6 +14,10 @@
     @if ($label)
         <label for="{{ $name }}" class="form-label">
             {{ $label }}
+
+            @if ($wajib)
+                <span class="text-danger">*</span>
+            @endif
         </label>
     @endif
 
@@ -20,6 +25,7 @@
         class="form-select @error($name) is-invalid @enderror"
         id="{{ $name }}"
         name="{{ $name }}"
+        @if ($wajib) required @endif
     >
 
         @if ($placeholder)
@@ -29,6 +35,7 @@
         @endif
 
         @foreach ($opsi as $pilihan)
+
             @php
                 $nilai = $pilihan[$keyValue];
                 $teks = $pilihan[$keyLabel];
@@ -40,6 +47,7 @@
             >
                 {{ $teks }}
             </option>
+
         @endforeach
 
     </select>

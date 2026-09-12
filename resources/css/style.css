@@ -1,0 +1,476 @@
+/* =========================================
+   LOGIN
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+
+/* =========================================
+   CONTAINER
+========================================= */
+
+.login-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+}
+
+
+/* =========================================
+   BAGIAN KIRI
+========================================= */
+
+.login-kiri {
+    width: 50%;
+    height: 100vh;
+    background: #2450d8;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: 70px 7%;
+}
+
+.kiri-content {
+    margin-top: 40px;
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.logo-wrapper {
+    width: 75px;
+    height: 75px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 25px;
+}
+
+.logo-stock {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+
+
+/* =========================================
+   JUDUL KIRI
+========================================= */
+
+.login-kiri h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+
+    margin-bottom: 12px;
+}
+
+.login-kiri h2 {
+    font-size: 20px;
+    font-weight: 500;
+
+    margin-bottom: 24px;
+}
+
+.subjudul {
+    font-size: 24px;
+    line-height: 1.4;
+
+    margin-bottom: 20px;
+}
+
+.deskripsi {
+    max-width: 520px;
+
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   COPYRIGHT
+========================================= */
+
+.copyright {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+
+/* =========================================
+   BAGIAN KANAN
+========================================= */
+
+.login-kanan {
+    width: 50%;
+    height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+}
+
+
+/* =========================================
+   LOGIN BOX
+========================================= */
+
+.login-box {
+    width: 100%;
+    max-width: 430px;
+}
+
+
+/* =========================================
+   ALERT ERROR
+========================================= */
+
+.alert-error {
+    width: 100%;
+
+    background: #fee2e2;
+    color: #b91c1c;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 8px;
+
+    padding: 12px 15px;
+
+    font-size: 14px;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================
+   JUDUL FORM
+========================================= */
+
+.login-box h2 {
+    color: #111827;
+
+    font-size: 32px;
+    font-weight: 700;
+
+    margin-bottom: 10px;
+}
+
+.login-info {
+    color: #64748b;
+
+    font-size: 16px;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+
+    color: #1e293b;
+
+    font-size: 16px;
+
+    margin-bottom: 8px;
+}
+
+
+/* =========================================
+   INPUT WRAPPER
+========================================= */
+
+.input-wrapper {
+    position: relative;
+
+    width: 100%;
+}
+
+
+/* =========================================
+   INPUT
+========================================= */
+
+.input-wrapper input {
+    width: 100%;
+    height: 46px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    background: #f8fafc;
+
+    padding: 0 45px;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+
+/* FOCUS */
+
+.input-wrapper input:focus {
+    border-color: #2563eb;
+
+    background: #ffffff;
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* PLACEHOLDER */
+
+.input-wrapper input::placeholder {
+    color: #94a3b8;
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.input-icon {
+    position: absolute;
+
+    left: 15px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 18px;
+    height: 18px;
+
+    pointer-events: none;
+}
+
+.input-icon svg {
+    width: 18px;
+    height: 18px;
+
+    fill: #64748b;
+}
+
+
+/* =========================================
+   EYE BUTTON
+========================================= */
+
+.eye-button {
+    position: absolute;
+
+    right: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    padding: 5px;
+}
+
+.eye-button svg {
+    width: 19px;
+    height: 19px;
+
+    fill: #64748b;
+
+    transition: 0.2s;
+}
+
+.eye-button:hover svg {
+    fill: #2563eb;
+}
+
+
+/* =========================================
+   BUTTON LOGIN
+========================================= */
+
+.btn-login {
+    width: 100%;
+    height: 46px;
+
+    margin-top: 5px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+/* HOVER */
+
+.btn-login:hover {
+    background: #1d4ed8;
+}
+
+
+/* ACTIVE */
+
+.btn-login:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================================
+   LUPA PASSWORD
+========================================= */
+
+.lupa-password {
+    text-align: center;
+
+    margin-top: 22px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.lupa-password span {
+    color: #2563eb;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    body {
+        overflow: auto;
+    }
+
+    .login-container {
+        height: auto;
+        min-height: 100vh;
+
+        flex-direction: column;
+    }
+
+    .login-kiri {
+        width: 100%;
+        height: auto;
+
+        min-height: 45vh;
+
+        padding: 40px 30px;
+    }
+
+    .login-kanan {
+        width: 100%;
+        height: auto;
+
+        min-height: 55vh;
+
+        padding: 40px 30px;
+    }
+
+    .login-kiri h1 {
+        font-size: 30px;
+    }
+
+    .subjudul {
+        font-size: 20px;
+    }
+
+    .login-box {
+        max-width: 450px;
+    }
+}
+
+    .logo-left {
+    width: 380px;
+    height: auto;
+    display: block;
+}
+
+.profil-navbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white !important;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ikon-profil {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: white;
+    color: #0d6efd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.dropdown-menu {
+    min-width: 190px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+    padding: 9px 14px;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f5f9;
+}
+
+.dropdown-item.text-danger:hover {
+    background-color: #fee2e2;
+}

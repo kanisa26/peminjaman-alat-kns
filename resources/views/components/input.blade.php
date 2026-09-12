@@ -1,8 +1,19 @@
-@props(['name', 'label', 'type' => 'text', 'value' => ''])
+@props([
+    'name',
+    'label',
+    'type' => 'text',
+    'value' => '',
+    'wajib' => false,
+])
 
 <div class="mb-3">
+
     <label for="{{ $name }}" class="form-label">
         {{ $label }}
+
+        @if ($wajib)
+            <span class="text-danger">*</span>
+        @endif
     </label>
 
     <input
@@ -15,8 +26,9 @@
     >
 
     @error($name)
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
             {{ $message }}
         </div>
     @enderror
+
 </div>

@@ -63,7 +63,7 @@ class PeranIzinSeeder extends Seeder
             'kategori.kelola',
             'peminjaman.kelola',
             'pengembalian.kelola',
-            'log. lihat',
+            'log.lihat',
             'pengaturan.kelola',
         ]);
 

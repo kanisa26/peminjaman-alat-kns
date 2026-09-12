@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Models\LogAktivitas;
+use App\Models\Pengembalian;
 
 class PeminjamanService
 {
@@ -65,6 +66,14 @@ class PeminjamanService
                     'jumlah' => $baris->jumlah,
                 ]);
             }
+
+            LogAktivitas::create([
+    'user_id' => $peminjam->id,
+    'aksi' => 'ajukan',
+    'tabel_tujuan' => 'peminjaman',
+    'deskripsi' => 'Mengajukan peminjaman ' . $peminjaman->kode_pinjam,
+    'ip_address' => request()->ip(),
+]);
 
             $this->keranjang->kosongkan();
 
@@ -185,4 +194,30 @@ class PeminjamanService
     {
         return (int) Pengaturan::ambil('default_hari_pinjam', 7);
     }
+
+    public function ajukanPengembalian(
+    Peminjaman $peminjaman
+): void {
+    abort_unless(
+        $peminjaman->status === StatusPeminjaman::Dipinjam,
+        422,
+        'Peminjaman tidak dapat dikembalikan.'
+    );
+
+    DB::transaction(function () use ($peminjaman) {
+
+        $peminjaman->update([
+            'status' => StatusPeminjaman::MenungguVerifikasi,
+            'tgl_diajukan_kembali' => now(),
+        ]);
+
+        LogAktivitas::create([
+    'user_id' => $peminjaman->user_id,
+    'aksi' => 'ajukan_pengembalian',
+    'tabel_tujuan' => 'peminjaman',
+    'deskripsi' => 'Mengajukan pengembalian ' . $peminjaman->kode_pinjam,
+    'ip_address' => request()->ip(),
+]);
+    });
+}
 }

@@ -63,10 +63,16 @@ class AlatController extends Controller
     $data = $request->validated();
 
     if ($request->hasFile('foto')) {
-        $namaFile = uniqid() . '.' . $request->file('foto')->extension();
 
-        $request->file('foto')
-            ->storeAs('alat', $namaFile, 'gambar');
+        $file = $request->file('foto');
+
+        $namaFile = uniqid() . '.' . $file->extension();
+
+        $file->storeAs(
+            'alat',
+            $namaFile,
+            'gambar'
+        );
 
         $data['foto'] = $namaFile;
     }
@@ -103,22 +109,34 @@ class AlatController extends Controller
     {
         $data = $request->validated();
 
-        if ($request->hasFile('foto')) {
-            $this->hapusFoto($alat->foto);
+    if ($request->hasFile('foto')) {
 
-            $namaFile = uniqid() . '.' . $request->file('foto')->extension();
+        // Hapus foto lama
+        $this->hapusFoto($alat->foto);
 
-            $request->file('foto')
-                ->storeAs('alat', $namaFile, 'gambar');
+        // Ambil foto baru
+        $file = $request->file('foto');
 
-            $data['foto'] = $namaFile;
-        }
+        // Buat nama file
+        $namaFile = uniqid() . '.' . $file->extension();
 
-        $alat->update($data);
+        // Simpan ke public/gambar/alat
+        $file->storeAs(
+            'alat',
+            $namaFile,
+            'gambar'
+        );
 
-        return redirect()
-            ->route('alat.index')
-            ->with('sukses', 'Data alat berhasil diperbarui.');
+        // Simpan nama file ke database
+        $data['foto'] = $namaFile;
+    }
+
+    // Update data alat
+    $alat->update($data);
+
+    return redirect()
+        ->route('alat.index')
+        ->with('sukses', 'Data alat berhasil diperbarui.');
     }
 
     /**

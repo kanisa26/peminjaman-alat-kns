@@ -43,18 +43,18 @@ class PenggunaRequest extends FormRequest
             ],
 
             'email' => [
-                'nullable',
-                'email',
-                'max:100',
-                Rule::unique('users', 'email')
-                    ->ignore($penggunaYangDiubah),
-            ],
+    'required',
+    'email',
+    'max:100',
+    Rule::unique('users', 'email')
+        ->ignore($penggunaYangDiubah),
+],
 
             'no_telp' => [
-                'nullable',
-                'string',
-                'max:20',
-            ],
+    'required',
+    'string',
+    'max:20',
+],
 
             'password' => [
                 $sedangMengubah ? 'nullable' : 'required',
@@ -62,6 +62,11 @@ class PenggunaRequest extends FormRequest
                 'min:8',
                 'confirmed',
             ],
+
+            'password_confirmation' => [
+    $sedangMengubah ? 'nullable' : 'required',
+    'same:password',
+],
 
             'peran' => [
                 'required',
@@ -76,13 +81,26 @@ class PenggunaRequest extends FormRequest
     }
 
     public function messages(): array
-    {
-        return [
-            'username.unique'     => 'Nama pengguna tersebut sudah dipakai.',
-            'username.alpha_dash' => 'Nama pengguna hanya boleh berisi huruf, angka, garis bawah, dan tanda hubung.',
-            'password.confirmed'  => 'Konfirmasi kata sandi tidak cocok.',
-            'password.min'        => 'Kata sandi minimal 8 karakter.',
-            'peran.required'      => 'Peran wajib dipilih.',
-        ];
-    }
+{
+    return [
+        'nama.required' => '*Wajib diisi',
+'username.required' => '*Wajib diisi',
+'email.required' => '*Wajib diisi',
+'password.required' => '*Wajib diisi',
+'no_telp.required' => '*Wajib diisi',
+'password_confirmation.required' => '*Wajib diisi',
+'password_confirmation.same' => 'Konfirmasi kata sandi tidak cocok.',
+'peran.required' => '*Wajib diisi',
+'is_aktif.required' => '*Wajib diisi',
+        'email.email' => 'Format email tidak valid.',
+        'password.required' => '* Wajib diisi.',
+        'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+        'password.min' => 'Kata sandi minimal 8 karakter.',
+        'peran.required' => '* Wajib dipilih.',
+        'is_aktif.required' => '* Wajib dipilih.',
+
+        'username.unique' => 'Nama pengguna tersebut sudah dipakai.',
+        'username.alpha_dash' => 'Nama pengguna hanya boleh berisi huruf, angka, garis bawah, dan tanda hubung.',
+    ];
+}
 }

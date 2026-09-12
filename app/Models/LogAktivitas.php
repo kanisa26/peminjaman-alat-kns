@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class LogAktivitas extends Model
 {
@@ -17,4 +18,13 @@ class LogAktivitas extends Model
         'deskripsi',
         'ip_address',
     ];
+
+    protected $casts = [
+    'created_at' => 'datetime',
+];
+
+public function pengguna()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
 }

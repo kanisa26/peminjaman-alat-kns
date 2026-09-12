@@ -15,10 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' =>RoleMiddleware::class,
-            'permission' =>PermissionMiddleware::class,
-            'role_or_permission' => RoleOrPermissionMiddleware::class,
-        ]);
+    'role' => RoleMiddleware::class,
+    'permission' => PermissionMiddleware::class,
+    'role_or_permission' => RoleOrPermissionMiddleware::class,
+
+    'aktif' => \App\Http\Middleware\CekUserAktif::class,
+]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

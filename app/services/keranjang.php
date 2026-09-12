@@ -3,15 +3,19 @@
 namespace App\Services;
 
 use App\Models\Alat;
-use Illuminate\Support\Facades\Session;
+use App\Models\Keranjang as ModelKeranjang;
 
 class Keranjang
 {
-    private const KUNCI_SESSION = 'keranjang';
-
     public function isiMentah(): array
     {
-        return Session::get(self::KUNCI_SESSION, []);
+        if (!auth()->check()) {
+            return [];
+        }
+
+        return ModelKeranjang::where('user_id', auth()->id())
+            ->pluck('jumlah', 'alat_id')
+            ->toArray();
     }
 
     public function isi()
@@ -36,52 +40,65 @@ class Keranjang
 
     public function tambah(Alat $alat, int $jumlah): void
     {
-        $isiMentah = $this->isiMentah();
+        if (!auth()->check()) {
+            return;
+        }
 
-        $jumlahLama = (int) ($isiMentah[$alat->id] ?? 0);
+        $keranjang = ModelKeranjang::firstOrNew([
+            'user_id' => auth()->id(),
+            'alat_id' => $alat->id,
+        ]);
 
+        $jumlahLama = (int) ($keranjang->jumlah ?? 0);
         $jumlahBaru = $jumlahLama + $jumlah;
 
         if ($jumlahBaru > $alat->stok_tersedia) {
             $jumlahBaru = $alat->stok_tersedia;
         }
 
-        $isiMentah[$alat->id] = $jumlahBaru;
-
-        Session::put(self::KUNCI_SESSION, $isiMentah);
-        Session::save();
+        $keranjang->jumlah = $jumlahBaru;
+        $keranjang->save();
     }
 
     public function ubahJumlah(Alat $alat, int $jumlah): void
     {
-        $isiMentah = $this->isiMentah();
+        if (!auth()->check()) {
+            return;
+        }
 
-        if (!isset($isiMentah[$alat->id])) {
+        $keranjang = ModelKeranjang::where('user_id', auth()->id())
+            ->where('alat_id', $alat->id)
+            ->first();
+
+        if (!$keranjang) {
             return;
         }
 
         $jumlah = min($jumlah, $alat->stok_tersedia);
 
-        $isiMentah[$alat->id] = (int) $jumlah;
-
-        Session::put(self::KUNCI_SESSION, $isiMentah);
-        Session::save();
+        $keranjang->jumlah = (int) $jumlah;
+        $keranjang->save();
     }
 
     public function hapus(int $alatId): void
     {
-        $isiMentah = $this->isiMentah();
+        if (!auth()->check()) {
+            return;
+        }
 
-        unset($isiMentah[$alatId]);
-
-        Session::put(self::KUNCI_SESSION, $isiMentah);
-        Session::save();
+        ModelKeranjang::where('user_id', auth()->id())
+            ->where('alat_id', $alatId)
+            ->delete();
     }
 
     public function kosongkan(): void
     {
-        Session::forget(self::KUNCI_SESSION);
-        Session::save();
+        if (!auth()->check()) {
+            return;
+        }
+
+        ModelKeranjang::where('user_id', auth()->id())
+            ->delete();
     }
 
     public function jumlahBaris(): int

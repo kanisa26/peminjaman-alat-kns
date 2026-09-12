@@ -10,13 +10,11 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Responses\LoginResponse;
 use App\Models\LogAktivitas;
 use App\Models\User;
-use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Contracts\LoginResponse as KontrakLoginResponse;
 use Laravel\Fortify\Fortify;
 
@@ -27,79 +25,104 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(KontrakLoginResponse::class, LoginResponse::class);
+        $this->app->singleton(
+            KontrakLoginResponse::class,
+            LoginResponse::class
+        );
     }
 
     /**
      * Bootstrap any application services.
      */
-
     public function boot(): void
     {
         Fortify::loginView(function () {
-        return view('auth.login');
-    });
+            return view('auth.login');
+        });
 
-    Fortify::username('username');
+        Fortify::username('username');
 
-    Fortify::authenticateUsing(function (Request $request) {
-        return $this->authenticate($request);
-    });
+        Fortify::authenticateUsing(function (Request $request) {
 
-    RateLimiter::for('login', function (Request $request) {
-        // Ambil username yang digunakan untuk login
-        $username = $request->username;
+            // Cari pengguna berdasarkan username
+            $pengguna = User::where(
+                'username',
+                $request->username
+            )->first();
 
-        // Batasi 5 kali percobaan per menit
-        // berdasarkan username dan IP Address
-        return Limit::perMinute(5)->by(
-            $username . '|' . $request->ip()
-        );
-    });
+            // Username tidak ditemukan / password salah
+            if (
+                !$pengguna ||
+                !Hash::check(
+                    $request->password,
+                    $pengguna->password
+                )
+            ) {
+                $this->catatLogGagal($request);
+
+                return null;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | VALIDASI AKUN
+            |--------------------------------------------------------------------------
+            */
+
+/*
+|--------------------------------------------------------------------------
+| CEK ROLE DAN VALIDASI AKUN
+|--------------------------------------------------------------------------
+*/
+
+$isAdmin = $pengguna->hasRole('admin');
+
+// ADMIN langsung boleh login
+if (!$isAdmin) {
+
+    // Pengguna yang belum divalidasi / sudah dinonaktifkan
+    if (!$pengguna->is_aktif) {
+        throw ValidationException::withMessages([
+            'username' =>
+                'Akun Anda belum divalidasi atau sedang dinonaktifkan. Silakan hubungi administrator.'
+        ]);
+    }
 }
 
-    /**
-     * Proses autentikasi user.
-     */
-    private function authenticate(Request $request): ?User
-    {
-        $pengguna = User::where(
-            'username',
-            $request->username
-        )->first();
+            /*
+            |--------------------------------------------------------------------------
+            | LOGIN BERHASIL
+            |--------------------------------------------------------------------------
+            */
 
-        // Username tidak ditemukan atau password salah
-        if (
-            !$pengguna ||
-            !Hash::check(
-                $request->password,
-                $pengguna->password
-            )
-        ) {
-            $this->catatLogGagal($request);
-
-            return null;
-        }
-
-        // Jika akun tidak aktif
-        if (!$pengguna->is_aktif) {
-            throw ValidationException::withMessages([
-                'username' => 'Akun Anda dinonaktifkan. Hubungi administrator.',
+            LogAktivitas::create([
+                'user_id' => $pengguna->id,
+                'aksi' => 'login',
+                'tabel_tujuan' => 'users',
+                'deskripsi' =>
+                    'Pengguna ' .
+                    $pengguna->username .
+                    ' berhasil masuk.',
+                'ip_address' => $request->ip(),
             ]);
-        }
 
-        // Catat aktivitas login berhasil
-        LogAktivitas::create([
-            'user_id' => $pengguna->id,
-            'aksi' => 'login',
-            'table_tujuan' => 'users',
-            'deskripsi' => 'Pengguna ' .
-                $pengguna->username .
-                ' berhasil masuk.',
-            'ip_address' => $request->ip(),
-        ]);
+            return $pengguna;
+        });
 
-        return $pengguna;
+        /*
+        |--------------------------------------------------------------------------
+        | RATE LIMIT LOGIN
+        |--------------------------------------------------------------------------
+        */
+
+        RateLimiter::for('login', function (Request $request) {
+
+            $username = $request->username;
+
+            return Limit::perMinute(5)->by(
+                $username . '|' . $request->ip()
+            );
+        });
     }
 
     /**
@@ -112,9 +135,14 @@ class FortifyServiceProvider extends ServiceProvider
         LogAktivitas::create([
             'user_id' => $penggunaId,
             'aksi' => 'login_gagal',
-            'table_tujuan' => 'users',
-            'deskripsi' => 'Percobaan masuk gagal untuk username ' .
+
+            // PERHATIKAN: tabel_tujuan, bukan table_tujuan
+            'tabel_tujuan' => 'users',
+
+            'deskripsi' =>
+                'Percobaan masuk gagal untuk username ' .
                 $request->username,
+
             'ip_address' => $request->ip(),
         ]);
     }

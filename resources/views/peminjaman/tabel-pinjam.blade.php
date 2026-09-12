@@ -7,7 +7,7 @@
             <th>Harus Kembali</th>
             <th class="text-center">Jumlah Alat</th>
             <th>Status</th>
-            <th style="width: 100px">Aksi</th>
+            <th style="width: 180px">Aksi</th>
         </tr>
     </thead>
 
@@ -45,14 +45,28 @@
                     </span>
                 </td>
 
-                <td>
-                    <a
-                        href="{{ route('peminjaman.rincian', $peminjaman) }}"
-                        class="btn btn-sm btn-outline-primary"
-                    >
-                        Rincian
-                    </a>
-                </td>
+                <td style="white-space: nowrap;">
+    <a href="{{ route('peminjaman.rincian', $peminjaman) }}"
+       class="btn btn-sm btn-outline-primary">
+        Rincian
+    </a>
+
+    @if ($peminjaman->status === \App\Enums\StatusPeminjaman::Dipinjam)
+        <form method="POST"
+              action="{{ route('peminjaman.pengembalian.ajukan', $peminjaman) }}"
+              class="d-inline"
+              onsubmit="return confirm('Ajukan pengembalian seluruh alat?')">
+
+            @csrf
+
+            <button type="submit"
+                    class="btn btn-sm btn-success">
+                Kembalikan
+            </button>
+
+        </form>
+    @endif
+</td>
 
             </tr>
 
