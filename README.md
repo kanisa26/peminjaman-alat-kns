@@ -1,4 +1,4 @@
-# SIPENAL
+# SIPENAL - Sistem Peminjaman Alat
 
 Sistem Peminjaman Alat
 
