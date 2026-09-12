@@ -43,17 +43,17 @@ class PenggunaRequest extends FormRequest
             ],
 
             'email' => [
-    'required',
-    'email',
-    'max:100',
-    Rule::unique('users', 'email')
-        ->ignore($penggunaYangDiubah),
-],
+                'required',
+                'email',
+                'max:100',
+                Rule::unique('users', 'email')
+                    ->ignore($penggunaYangDiubah),
+            ],
 
             'no_telp' => [
     'required',
-    'string',
-    'max:20',
+    'numeric',
+    'digits_between:10,15',
 ],
 
             'password' => [
@@ -64,9 +64,9 @@ class PenggunaRequest extends FormRequest
             ],
 
             'password_confirmation' => [
-    $sedangMengubah ? 'nullable' : 'required',
-    'same:password',
-],
+                $sedangMengubah ? 'nullable' : 'required',
+                'same:password',
+            ],
 
             'peran' => [
                 'required',
@@ -80,27 +80,44 @@ class PenggunaRequest extends FormRequest
         ];
     }
 
+    /**
+     * Pesan validasi.
+     */
     public function messages(): array
-{
-    return [
-        'nama.required' => '*Wajib diisi',
-'username.required' => '*Wajib diisi',
-'email.required' => '*Wajib diisi',
-'password.required' => '*Wajib diisi',
-'no_telp.required' => '*Wajib diisi',
-'password_confirmation.required' => '*Wajib diisi',
-'password_confirmation.same' => 'Konfirmasi kata sandi tidak cocok.',
-'peran.required' => '*Wajib diisi',
-'is_aktif.required' => '*Wajib diisi',
-        'email.email' => 'Format email tidak valid.',
-        'password.required' => '* Wajib diisi.',
-        'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
-        'password.min' => 'Kata sandi minimal 8 karakter.',
-        'peran.required' => '* Wajib dipilih.',
-        'is_aktif.required' => '* Wajib dipilih.',
+    {
+        return [
 
-        'username.unique' => 'Nama pengguna tersebut sudah dipakai.',
-        'username.alpha_dash' => 'Nama pengguna hanya boleh berisi huruf, angka, garis bawah, dan tanda hubung.',
-    ];
-}
+        'no_telp.required' =>
+            'Nomor telepon wajib diisi.',
+
+        'no_telp.numeric' =>
+            'Nomor telepon hanya boleh berisi angka.',
+
+        'no_telp.digits_between' =>
+            'Nomor telepon harus terdiri dari 10 sampai 15 angka.',
+            'nama.required' => '*Wajib diisi',
+
+            'username.required' => '*Wajib diisi',
+            'username.unique' => 'Nama pengguna tersebut sudah dipakai.',
+            'username.alpha_dash' => 'Nama pengguna hanya boleh berisi huruf, angka, garis bawah, dan tanda hubung.',
+
+            'email.required' => '*Wajib diisi',
+            'email.email' => 'Format email tidak valid.',
+
+            'no_telp.required' => '*Wajib diisi',
+            'no_telp.numeric' => 'Nomor telepon hanya boleh berisi angka.',
+            'no_telp.digits_between' => 'Nomor telepon harus terdiri dari 10 sampai 15 angka.',
+
+            'password.required' => '*Wajib diisi',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+
+            'password_confirmation.required' => '*Wajib diisi',
+            'password_confirmation.same' => 'Konfirmasi kata sandi tidak cocok.',
+
+            'peran.required' => '* Wajib dipilih.',
+
+            'is_aktif.required' => '* Wajib dipilih.',
+        ];
+    }
 }

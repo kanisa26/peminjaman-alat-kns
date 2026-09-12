@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Models\LogAktivitas;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class PenggunaController extends Controller
 {
@@ -81,40 +82,43 @@ class PenggunaController extends Controller
      * Jadi tidak masuk antrean validasi.
      */
     public function store(PenggunaRequest $request)
-    {
-        $data = $request->validated();
+{
+    $data = $request->validated();
 
-        $pengguna = User::create([
-            'nama'             => $data['nama'],
-            'username'         => $data['username'],
-            'email'            => $data['email'] ?? null,
-            'no_telp'          => $data['no_telp'] ?? null,
-            'password'         => $data['password'],
+    $pengguna = User::create([
+        'nama'            => $data['nama'],
+        'username'        => $data['username'],
+        'email'           => $data['email'] ?? null,
+        'no_telp'         => $data['no_telp'] ?? null,
+        'password'        => $data['password'],
 
-            // Semua pengguna yang dibuat Admin langsung aktif
-            'is_aktif'         => true,
-            'status_validasi'  => 'disetujui',
-        ]);
+        // Mengikuti pilihan Status Aktif dari form
+        'is_aktif'        => $data['is_aktif'],
 
-        $pengguna->syncRoles([
-            $data['peran']
-        ]);
+        // Karena dibuat langsung oleh Admin,
+        // status validasi tetap disetujui
+        'status_validasi' => 'disetujui',
+    ]);
 
-        LogAktivitas::create([
-            'user_id'       => auth()->id(),
-            'aksi'          => 'TAMBAH',
-            'tabel_tujuan'  => 'users',
-            'deskripsi'     => 'Menambahkan pengguna "' . $pengguna->nama . '". Akun langsung aktif.',
-            'ip_address'    => request()->ip(),
-        ]);
+    $pengguna->syncRoles([
+        $data['peran']
+    ]);
 
-        return redirect()
-            ->route('pengguna.index')
-            ->with(
-                'sukses',
-                'Pengguna berhasil ditambahkan dan langsung aktif.'
-            );
-    }
+    LogAktivitas::create([
+        'user_id'      => Auth::id(),
+        'aksi'         => 'TAMBAH',
+        'tabel_tujuan' => 'users',
+        'deskripsi'    => 'Menambahkan pengguna "' . $pengguna->nama . '".',
+        'ip_address'   => request()->ip(),
+    ]);
+
+    return redirect()
+        ->route('pengguna.index')
+        ->with(
+            'sukses',
+            'Pengguna berhasil ditambahkan.'
+        );
+}
 
 
     /**
@@ -192,7 +196,7 @@ class PenggunaController extends Controller
         ]);
 
         LogAktivitas::create([
-            'user_id'       => auth()->id(),
+            'user_id'       => Auth::id(),
             'aksi'          => 'UBAH',
             'tabel_tujuan'  => 'users',
             'deskripsi'     => 'Mengubah data pengguna "' . $pengguna->nama . '".',
@@ -252,7 +256,7 @@ class PenggunaController extends Controller
         $pengguna->save();
 
         LogAktivitas::create([
-            'user_id'       => auth()->id(),
+            'user_id'       => Auth::id(),
             'aksi'          => 'VALIDASI',
             'tabel_tujuan'  => 'users',
             'deskripsi'     => 'Memvalidasi pengguna "' . $pengguna->nama . '".',
@@ -310,7 +314,7 @@ class PenggunaController extends Controller
         $pengguna->save();
 
         LogAktivitas::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'aksi' => 'TOLAK',
             'tabel_tujuan' => 'users',
             'deskripsi' =>
@@ -441,6 +445,6 @@ class PenggunaController extends Controller
      */
     private function diriSendiri(User $pengguna): bool
     {
-        return $pengguna->id === auth()->id();
+        return $pengguna->id === Auth::id();
     }
 }
