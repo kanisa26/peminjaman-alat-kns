@@ -26,9 +26,10 @@
     </div>
 
     <div class="col-auto">
-        <button type="submit" class="btn btn-outline-secondary">
-            Saring
-        </button>
+        <button type="submit"
+                        class="btn btn-primary btn-cari">
+                    Cari
+                </button>
 
         <a
             href="{{ route('alat.index') }}"

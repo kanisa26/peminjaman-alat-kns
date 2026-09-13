@@ -104,10 +104,6 @@ class PenggunaRequest extends FormRequest
             'email.required' => '*Wajib diisi',
             'email.email' => 'Format email tidak valid.',
 
-            'no_telp.required' => '*Wajib diisi',
-            'no_telp.numeric' => 'Nomor telepon hanya boleh berisi angka.',
-            'no_telp.digits_between' => 'Nomor telepon harus terdiri dari 10 sampai 15 angka.',
-
             'password.required' => '*Wajib diisi',
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
