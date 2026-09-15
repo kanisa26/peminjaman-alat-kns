@@ -31,9 +31,21 @@
                        onchange="cekTanggalRPT2()">
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">
-                Cetak PDF
-            </button>
+            <div class="d-flex gap-2">
+
+    <button type="submit"
+            class="btn btn-primary flex-fill">
+        Cetak PDF
+    </button>
+
+    <button type="submit"
+            class="btn btn-success flex-fill"
+            formaction="{{ route('laporan.pengembalian.excel') }}"
+            formtarget="_blank">
+        Cetak Excel
+    </button>
+
+</div>
 
         </form>
     </div>

@@ -286,22 +286,40 @@ Route::get('/peminjam/dasbor', function () {
     });
 
     Route::middleware('permission:laporan.cetak')
-        ->prefix('laporan')
-        ->name('laporan.')
-        ->group(function () {
+    ->prefix('laporan')
+    ->name('laporan.')
+    ->group(function () {
 
-            Route::get('/', [LaporanController::class, 'form'])
-                ->name('form');
+        // Halaman laporan
+        Route::get('/', [LaporanController::class, 'form'])
+            ->name('form');
 
-            Route::get('/peminjaman', [LaporanController::class, 'peminjaman'])
-                ->name('peminjaman');
+        // =========================
+        // PDF
+        // =========================
 
-            Route::get('/pengembalian', [LaporanController::class, 'pengembalian'])
-                ->name('pengembalian');
+        Route::get('/peminjaman', [LaporanController::class, 'peminjaman'])
+            ->name('peminjaman');
 
-            Route::get('/stok', [LaporanController::class, 'stok'])
-                ->name('stok');
-        });
+        Route::get('/pengembalian', [LaporanController::class, 'pengembalian'])
+            ->name('pengembalian');
+
+        Route::get('/stok', [LaporanController::class, 'stok'])
+            ->name('stok');
+
+        // =========================
+        // EXCEL
+        // =========================
+
+        Route::get('/peminjaman/excel', [LaporanController::class, 'peminjamanExcel'])
+            ->name('peminjaman.excel');
+
+        Route::get('/pengembalian/excel', [LaporanController::class, 'pengembalianExcel'])
+            ->name('pengembalian.excel');
+
+        Route::get('/stok/excel', [LaporanController::class, 'stokExcel'])
+            ->name('stok.excel');
+    });
 
         Route::middleware('permission:peminjaman.kelola')
         ->prefix('koreksi/peminjaman')

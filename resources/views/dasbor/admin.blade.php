@@ -1022,6 +1022,46 @@
     color: #fff;
     transform: translateY(-1px);
 }
+
+/* =========================================================
+   GRAFIK AKTIVITAS PEMINJAMAN
+========================================================= */
+
+.activity-box {
+    width: 100%;
+    min-height: 420px;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.activity-header h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.activity-header p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.activity-chart {
+    position: relative;
+    width: 100%;
+    height: 320px;
+}
+
+.activity-chart canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
 </style>
 
 
@@ -1149,186 +1189,31 @@
     ================================== --}}
     <div class="dashboard-left">
 
-        {{-- =========================
-             STATUS PEMINJAMAN
-        ========================== --}}
-        <div class="dashboard-box status-box">
+        {{-- =========================================================
+     GRAFIK AKTIVITAS PEMINJAMAN
+========================================================= --}}
 
-            <h5>STATUS PEMINJAMAN</h5>
+<div class="dashboard-box activity-box">
 
-            @php
+    <div class="activity-header">
 
-                $total =
-                    $statusDiajukan +
-                    $statusDipinjam +
-                    $statusVerifikasi +
-                    $statusSelesai;
+        <div>
+            <h5>AKTIVITAS PEMINJAMAN</h5>
 
-                $persenDiajukan = $total > 0
-                    ? round(($statusDiajukan / $total) * 100)
-                    : 0;
-
-                $persenDipinjam = $total > 0
-                    ? round(($statusDipinjam / $total) * 100)
-                    : 0;
-
-                $persenVerifikasi = $total > 0
-                    ? round(($statusVerifikasi / $total) * 100)
-                    : 0;
-
-                $persenSelesai = $total > 0
-                    ? round(($statusSelesai / $total) * 100)
-                    : 0;
-
-            @endphp
-
-            <div class="status-content">
-
-                {{-- DONAT --}}
-                <div class="status-donut-wrapper">
-
-                    <svg
-                        class="status-donut-svg"
-                        viewBox="0 0 190 190"
-                    >
-
-                        <g transform="rotate(-90 95 95)">
-
-                            {{-- DIAJUKAN --}}
-<circle
-    class="donut-segment"
-    cx="95"
-    cy="95"
-    r="68"
-    stroke="#facc15"
-    data-status="Diajukan"
-    data-jumlah="{{ $statusDiajukan }}"
-    data-persen="{{ $persenDiajukan }}"
-/>
-
-{{-- DIPINJAM --}}
-<circle
-    class="donut-segment"
-    cx="95"
-    cy="95"
-    r="68"
-    stroke="#2563eb"
-    data-status="Dipinjam"
-    data-jumlah="{{ $statusDipinjam }}"
-    data-persen="{{ $persenDipinjam }}"
-/>
-
-{{-- MENUNGGU VERIFIKASI --}}
-<circle
-    class="donut-segment"
-    cx="95"
-    cy="95"
-    r="68"
-    stroke="#60a5fa"
-    data-status="Menunggu Verifikasi"
-    data-jumlah="{{ $statusVerifikasi }}"
-    data-persen="{{ $persenVerifikasi }}"
-/>
-
-{{-- SELESAI --}}
-<circle
-    class="donut-segment"
-    cx="95"
-    cy="95"
-    r="68"
-    stroke="#15803d"
-    data-status="Selesai"
-    data-jumlah="{{ $statusSelesai }}"
-    data-persen="{{ $persenSelesai }}"
-/>
-
-                        </g>
-
-                    </svg>
-
-
-                    {{-- TENGAH DONAT --}}
-                    <div class="status-donut-inner">
-
-                        <strong>{{ $total }}</strong>
-
-                        <small>Total</small>
-
-                    </div>
-
-
-                    {{-- TOOLTIP --}}
-                    <div
-                        class="donut-tooltip"
-                        id="donutTooltip"
-                    ></div>
-
-                </div>
-
-
-                {{-- KETERANGAN STATUS --}}
-                <div class="status-info">
-
-                    <div class="status-row">
-                        <div class="status-label">
-
-                            <span
-                                class="status-dot"
-                                style="background:#facc15"
-                            ></span>
-
-                            <span>Diajukan</span>
-
-                        </div>
-                    </div>
-
-
-                    <div class="status-row">
-                        <div class="status-label">
-
-                            <span
-                                class="status-dot"
-                                style="background:#2563eb"
-                            ></span>
-
-                            <span>Dipinjam</span>
-
-                        </div>
-                    </div>
-
-
-                    <div class="status-row">
-                        <div class="status-label">
-
-                            <span
-                                class="status-dot"
-                                style="background:#60a5fa"
-                            ></span>
-
-                            <span>Menunggu Verifikasi</span>
-
-                        </div>
-                    </div>
-
-
-                    <div class="status-row">
-                        <div class="status-label">
-
-                            <span
-                                class="status-dot"
-                                style="background:#15803d"
-                            ></span>
-
-                            <span>Selesai</span>
-
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
+            <p>
+                Jumlah peminjaman selama {{ $namaBulan }}
+            </p>
         </div>
+
+    </div>
+
+    <div class="activity-chart">
+
+        <canvas id="grafikAktivitasPeminjaman"></canvas>
+
+    </div>
+
+</div>
 
 
         {{-- =========================
@@ -2221,7 +2106,124 @@ document.getElementById('formTolak')
 
 });
 
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const canvas = document.getElementById(
+        'grafikAktivitasPeminjaman'
+    );
+
+    if (!canvas) {
+        return;
+    }
+
+    new Chart(canvas, {
+
+        type: 'line',
+
+        data: {
+            labels: @json($grafikLabel),
+
+            datasets: [{
+                label: 'Jumlah Peminjaman',
+
+                data: @json($grafikData),
+
+                borderWidth: 3,
+
+                tension: 0.35,
+
+                fill: true,
+
+                pointRadius: 4,
+
+                pointHoverRadius: 6,
+
+                borderColor: '#2563eb',
+
+                backgroundColor: 'rgba(37, 99, 235, 0.10)',
+
+                pointBackgroundColor: '#ffffff',
+
+                pointBorderColor: '#2563eb',
+
+                pointBorderWidth: 2
+            }]
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+
+            plugins: {
+
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+                    callbacks: {
+
+                        label: function (context) {
+
+                            return ' ' +
+                                context.parsed.y +
+                                ' peminjaman';
+
+                        }
+
+                    }
+                }
+            },
+
+            scales: {
+
+                x: {
+
+                    title: {
+                        display: true,
+                        text: 'Tanggal'
+                    },
+
+                    grid: {
+                        display: false
+                    }
+
+                },
+
+                y: {
+
+                    beginAtZero: true,
+
+                    title: {
+                        display: true,
+                        text: 'Jumlah Peminjaman'
+                    },
+
+                    ticks: {
+                        precision: 0
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+});
+
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 @endif
 

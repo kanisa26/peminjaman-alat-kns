@@ -8,6 +8,7 @@ use App\Models\Peminjaman;
 use App\Models\Pengembalian;
 use App\Models\LogAktivitas;
 use App\Enums\StatusPeminjaman;
+use Carbon\Carbon;
 
 class DasborAdminController extends Controller
 {
@@ -15,11 +16,6 @@ class DasborAdminController extends Controller
     {
         $totalAlat = Alat::count();
 
-        /*
-         * Hanya pengguna yang:
-         * - sudah disetujui
-         * - dan aktif
-         */
         $totalPengguna = User::where(
             'status_validasi',
             'disetujui'
@@ -33,8 +29,10 @@ class DasborAdminController extends Controller
 
 
         /*
-         * STATUS PEMINJAMAN
-         */
+        |--------------------------------------------------------------------------
+        | STATUS PEMINJAMAN
+        |--------------------------------------------------------------------------
+        */
 
         $statusDiajukan = Peminjaman::where(
             'status',
@@ -58,8 +56,63 @@ class DasborAdminController extends Controller
 
 
         /*
-         * PEMINJAMAN TERBARU
-         */
+        |--------------------------------------------------------------------------
+        | GRAFIK AKTIVITAS PEMINJAMAN BULAN SEBELUMNYA
+        |--------------------------------------------------------------------------
+        */
+
+        // Mengambil bulan sebelumnya
+        $bulanSebelumnya = Carbon::now()->subMonth();
+
+        $awalBulan = $bulanSebelumnya->copy()->startOfMonth();
+        $akhirBulan = $bulanSebelumnya->copy()->endOfMonth();
+
+        // Ambil semua peminjaman pada bulan sebelumnya
+        $dataPeminjaman = Peminjaman::whereBetween(
+            'tgl_pinjam',
+            [
+                $awalBulan->toDateString(),
+                $akhirBulan->toDateString()
+            ]
+        )
+        ->get(['tgl_pinjam']);
+
+        // Kelompokkan berdasarkan tanggal
+        $peminjamanPerTanggal = $dataPeminjaman
+            ->groupBy(function ($item) {
+                return Carbon::parse($item->tgl_pinjam)
+                    ->format('Y-m-d');
+            });
+
+        $grafikLabel = [];
+        $grafikData = [];
+
+        // Buat tanggal dari awal sampai akhir bulan
+        $tanggal = $awalBulan->copy();
+
+        while ($tanggal->lte($akhirBulan)) {
+
+            $tanggalKey = $tanggal->format('Y-m-d');
+
+            $grafikLabel[] = $tanggal->format('d');
+
+            $grafikData[] = $peminjamanPerTanggal
+                ->get($tanggalKey, collect())
+                ->count();
+
+            $tanggal->addDay();
+        }
+
+        // Nama bulan untuk judul grafik
+        $namaBulan = $bulanSebelumnya->locale('id')
+            ->translatedFormat('F Y');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PEMINJAMAN TERBARU
+        |--------------------------------------------------------------------------
+        */
 
         $peminjamanTerbaru = Peminjaman::with('peminjam')
             ->latest()
@@ -68,15 +121,11 @@ class DasborAdminController extends Controller
 
 
         /*
-         * USER YANG MENUNGGU VALIDASI
-         *
-         * HANYA yang statusnya "menunggu".
-         *
-         * Admin yang dibuat lewat menu Pengguna
-         * sudah disetujui, jadi tidak akan masuk sini.
-         *
-         * User yang ditolak juga tidak akan masuk sini.
-         */
+        |--------------------------------------------------------------------------
+        | USER MENUNGGU VALIDASI
+        |--------------------------------------------------------------------------
+        */
+
         $penggunaPending = User::with('roles')
             ->where('status_validasi', 'menunggu')
             ->where('is_aktif', false)
@@ -85,8 +134,10 @@ class DasborAdminController extends Controller
 
 
         /*
-         * AKTIVITAS TERBARU
-         */
+        |--------------------------------------------------------------------------
+        | AKTIVITAS TERBARU
+        |--------------------------------------------------------------------------
+        */
 
         $aktivitasTerbaru = LogAktivitas::with('pengguna')
             ->latest('created_at')
@@ -99,10 +150,16 @@ class DasborAdminController extends Controller
             'totalPengguna',
             'totalPeminjaman',
             'totalPengembalian',
+
             'statusDiajukan',
             'statusDipinjam',
             'statusVerifikasi',
             'statusSelesai',
+
+            'grafikLabel',
+            'grafikData',
+            'namaBulan',
+
             'peminjamanTerbaru',
             'penggunaPending',
             'aktivitasTerbaru'
